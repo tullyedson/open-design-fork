@@ -135,6 +135,9 @@ export const clusterTest = base.extend({
 });
 
 export { expect };
+// The portable MCP App does not run the standalone daemon/web sidecars.
+// Its tests own a fresh stdio server/database and official SDK host per test.
+export const mcpAppTest = base;
 export type { PlaywrightToolsDevSuite };
 
 async function createPlaywrightToolsDevSuite(

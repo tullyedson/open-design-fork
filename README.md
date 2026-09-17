@@ -1,3 +1,18 @@
+# Open Design MCP App fork
+
+This fork adds a **standard, host-neutral MCP App**: an interactive Open Design
+editor embedded in an MCP Apps-capable host, driven by either a person or the
+host's assistant. It includes a standalone stdio MCP server and portable UI bundle.
+It does not require a separate model, cloud account or proprietary host backend.
+
+**[Build, connect and use the MCP App →](docs/mcp-app.md)**
+
+The conversion reuses Open Design's preview and visual editing components.
+The original upstream application, license and public history are retained below;
+upstream's cloud offerings are unrelated to the MCP App edition.
+
+---
+
 <h1 align="center">Open Design: The open-source Claude Design alternative</h1>
 
 > ⚡ **Open Design Cloud — the official model service.** One recharge to use GPT, Claude, Gemini, and DeepSeek inside Open Design: 20+ flagship models, zero config, billed by real token usage. [Try Open Design Cloud](https://open-design.ai/cloud/?utm_source=github&utm_medium=referral&utm_content=readme_try_cloud)

@@ -21,6 +21,9 @@
     "src"
   ],
   "scripts": {
+    "build:mcp-app": "node ../../scripts/build-mcp-app.ts",
+    "test:mcp-app": "vitest run -c vitest.mcp-app.config.ts",
+    "typecheck:mcp-app": "tsc -p tsconfig.mcp-app.json",
     "dev": "next dev --turbopack",
     "build": "next build",
     "build:sidecar": "tsc -p tsconfig.sidecar.json",
@@ -28,6 +31,8 @@
     "test": "vitest run -c vitest.config.ts --maxWorkers=2"
   },
   "dependencies": {
+    "@modelcontextprotocol/ext-apps": "1.7.5",
+    "@modelcontextprotocol/sdk": "1.29.0",
     "@anthropic-ai/sdk": "0.32.1",
     "@excalidraw/excalidraw": "0.18.1",
     "@formkit/auto-animate": "0.9.0",

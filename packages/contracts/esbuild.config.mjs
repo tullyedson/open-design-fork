@@ -4,6 +4,7 @@ await build({
   bundle: true,
   entryNames: "[dir]/[name]",
   entryPoints: [
+    "./src/mcp-design.ts",
     "./src/index.ts",
     "./src/critique.ts",
     "./src/api/connectionTest.ts",

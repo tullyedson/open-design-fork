@@ -1,4 +1,8 @@
 node_modules
+# Standalone MCP App stores are local data, never source.
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
 dist/
 out/
 .next/

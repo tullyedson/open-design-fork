@@ -1,0 +1,24 @@
+{
+  "name": "@open-design/mcp-app-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Standalone, host-neutral Open Design MCP App server",
+  "scripts": {
+    "build": "node ../../scripts/build-mcp-app.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "1.7.5",
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "@open-design/contracts": "workspace:*",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.5",
+    "typescript": "5.9.3",
+    "vitest": "4.1.6"
+  },
+  "engines": { "node": "~24" }
+}
