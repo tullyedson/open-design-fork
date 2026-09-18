@@ -400,6 +400,62 @@ async function renderFeishuBuildCard(env: Record<string, string>): Promise<Recor
 }
 
 describe("packaged smoke workflow", () => {
+  it("[P1] runs the critique conformance workflow entrypoint and persists both adapter results", async () => {
+    const workflow = (await readFile(
+      join(workspaceRoot, ".github", "workflows", "critique-conformance.yml"),
+      "utf8",
+    )).replace(/\r\n/g, "\n");
+    const command = extractWorkflowRunScript(workflow, "Run conformance harness (synthetic adapters)");
+    const [executable, ...args] = command.trim().split(/\s+/);
+    expect(executable).toBe("node");
+    const harnessStep = sectionBetween(
+      workflow,
+      "      - name: Run conformance harness (synthetic adapters)",
+      "      - name: Upload history snapshot",
+    );
+    const uploadStep = workflow.slice(workflow.indexOf("      - name: Upload history snapshot"));
+    expect(uploadStep).toContain("if-no-files-found: error");
+    const runnerTemp = await mkdtemp(join(tmpdir(), "od-critique-workflow-"));
+
+    try {
+      const resolveRunnerPath = (value: string): string => {
+        const prefix = "${{ runner.temp }}/";
+        expect(value.startsWith(prefix)).toBe(true);
+        return join(runnerTemp, value.slice(prefix.length));
+      };
+      const dataDir = resolveRunnerPath(/^\s+OD_DATA_DIR:\s*(.+)$/m.exec(harnessStep)?.[1] ?? "");
+      const historyDir = resolveRunnerPath(/^\s+path:\s*(.+)$/m.exec(uploadStep)?.[1] ?? "");
+      // Execute the workflow's command, not a second hard-coded entrypoint.
+      // Missing/renamed scripts and fixtures must fail before a snapshot can pass.
+      const { stdout } = await execFileAsync(process.execPath, args, {
+        cwd: workspaceRoot,
+        env: workflowFixtureEnv({ OD_DATA_DIR: dataDir }),
+        timeout: T.medium,
+      });
+      expect(stdout).toContain("synthetic-good shipped");
+      expect(stdout).toContain("synthetic-bad degraded");
+
+      // Inspect exactly the location the workflow will upload.
+      expect((await readdir(historyDir)).sort()).toEqual(["synthetic-bad", "synthetic-good"]);
+      for (const [adapter, shippedRate] of [["synthetic-good", 1], ["synthetic-bad", 0]] as const) {
+        const adapterDir = join(historyDir, adapter);
+        const files = await readdir(adapterDir);
+        expect(files).toHaveLength(1);
+        expect(files[0]).toMatch(/^\d{4}-\d{2}-\d{2}\.jsonl$/);
+        const lines = (await readFile(join(adapterDir, files[0]!), "utf8")).trim().split("\n");
+        expect(lines).toHaveLength(1);
+        expect(JSON.parse(lines[0]!)).toMatchObject({
+          date: files[0]!.slice(0, -".jsonl".length),
+          adapter,
+          shippedRate,
+          totalRuns: 1,
+        });
+      }
+    } finally {
+      await rm(runnerTemp, { recursive: true, force: true });
+    }
+  }, T.long);
+
   it("[P2] keeps packaged smoke outside the main CI gate", async () => {
     const workflow = await readFile(ciWorkflowPath, "utf8");
     expect(workflow).not.toContain("packaged_smoke_");

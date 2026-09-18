@@ -59,14 +59,16 @@ jobs:
       # non-zero on any thrown error so the workflow fails loudly
       # instead of uploading an empty history snapshot.
       - name: Run conformance harness (synthetic adapters)
+        env:
+          OD_DATA_DIR: ${{ runner.temp }}/critique-conformance
         run: |
-          node --import tsx apps/daemon/src/critique/__fixtures__/run-nightly.ts
+          node --import tsx apps/daemon/src/critique/__fixtures__/run-prerelease.ts
 
       - name: Upload history snapshot
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: critique-conformance-${{ github.run_id }}
-          path: .od/conformance/
-          if-no-files-found: ignore
+          path: ${{ runner.temp }}/critique-conformance/conformance/
+          if-no-files-found: error
           retention-days: 30
